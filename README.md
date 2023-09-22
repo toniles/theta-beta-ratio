@@ -1,6 +1,6 @@
 # θ/β Ratio Calculator (t/b Ratio Calculator)
 
-The $\( \frac{θ}{β} \)$ ratio characterizes the amplitude relationship between the theta $(\( θ \))$ and beta $(\( β \))$ frequency bands in EEG (electroencephalogram) data.
+The $\( \frac{θ}{β} \)$ ratio characterizes the amplitude relationship between the theta $\( θ \)$ and beta $\( β \)$ frequency bands in EEG (electroencephalogram) data.
 
 ## Mathematical Framework
 
