@@ -52,6 +52,8 @@ This comprehensive methodology ensures a robust computation of the $\( \frac{θ}
 
 ## Download
 
+Go to: https://github.com/toniles/theta-beta-ratio
+
 CTRL + F
 
 Type: releases
