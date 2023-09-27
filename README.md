@@ -52,7 +52,8 @@ This comprehensive methodology ensures a robust computation of the $\( \frac{θ}
 
 ## Download
 
-Click [here](URL_OF_THE_FILE) to download the `.exe` file.
+CTRL + F
+Type: releases
 
 ## Disclaimer
 
