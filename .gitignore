@@ -1,6 +1,0 @@
-build/
-*.o
-*.pro.user
-*.swp
-*.appimage
-.DS_Store

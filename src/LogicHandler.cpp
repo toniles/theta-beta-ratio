@@ -129,8 +129,6 @@ void LogicHandler::applyFiltersAndComputeAverages(
     lineEdit_avg_beta2->setText(QString::number(calculateAverage(beta2Values)));
 }
 
-
-
 // FIRST FILTER
 
 /* 
