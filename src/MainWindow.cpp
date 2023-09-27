@@ -202,17 +202,7 @@ void MainWindow::onBtnCalculateClicked()
 
 void MainWindow::onLineEditTextChanged()
 {
-    logicHandler->updateAllAverages(
-        lineEdit_theta->text(), 300, 4, 0.2, lineEdit_avg_theta,  // For theta
-        lineEdit_beta1->text(), 20, 4, 0.2, lineEdit_avg_beta1,  // For beta1
-        lineEdit_beta2->text(), 20, 4, 0.2, lineEdit_avg_beta2   // For beta2
-    );
-}
-
-
-void MainWindow::onCheckBoxToggled()
-{
-    logicHandler->applyFiltersIfChecked(
+    logicHandler->applyFiltersAndComputeAverages(
         checkBox_theta->isChecked(),
         checkBox_beta1->isChecked(),
         checkBox_beta2->isChecked(),
@@ -230,6 +220,23 @@ void MainWindow::onCheckBoxToggled()
     );
 }
 
-
-
+void MainWindow::onCheckBoxToggled()
+{
+    logicHandler->applyFiltersAndComputeAverages(
+        checkBox_theta->isChecked(),
+        checkBox_beta1->isChecked(),
+        checkBox_beta2->isChecked(),
+        lineEdit_theta->text(),
+        lineEdit_beta1->text(),
+        lineEdit_beta2->text(),
+        lineEdit_avg_theta,
+        lineEdit_avg_beta1,
+        lineEdit_avg_beta2,
+        checkBox_exponentialFiltering->isChecked(),
+        checkBox_dataInterpolation->isChecked(),
+        checkBox_medianFiltering->isChecked(),
+        checkBox_normalization->isChecked(),
+        checkBox_savitzkyGolay->isChecked()
+    );
+}
 

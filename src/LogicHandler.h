@@ -1,9 +1,10 @@
 #ifndef LOGICHANDLER_H
 #define LOGICHANDLER_H
 
+#include <QObject>
 #include <QString>
 #include <QLineEdit>
-#include <QObject>
+#include <QVector>
 
 class LogicHandler : public QObject {
     Q_OBJECT
@@ -11,21 +12,15 @@ class LogicHandler : public QObject {
 public:
     explicit LogicHandler(QObject *parent = nullptr);
 
+    // Funciones de filtrado
     QString exponentialFiltering(const QString &data);
     QString dataInterpolation(const QString &data);
     QString medianFiltering(const QString &data);
     QString normalization(const QString &data);
     QString savitzkyGolaySmoothing(const QString &data);
 
-public slots:
-    void updateAverage(const QString &input, double maxLimit, double multiple, double reductionFactor, QLineEdit *averageLineEdit);
-    void updateAllAverages(
-        const QString &inputTheta, double maxLimitTheta, double multipleTheta, double reductionFactorTheta, QLineEdit *averageLineEditTheta,
-        const QString &inputBeta1, double maxLimitBeta1, double multipleBeta1, double reductionFactorBeta1, QLineEdit *averageLineEditBeta1,
-        const QString &inputBeta2, double maxLimitBeta2, double multipleBeta2, double reductionFactorBeta2, QLineEdit *averageLineEditBeta2
-    );
-    void calculateRatio(const QString &avgTheta, const QString &avgBeta1, const QString &avgBeta2, QLineEdit *resultLineEdit);
-    void applyFiltersIfChecked(
+    // Función para aplicar filtros y calcular promedios
+    void applyFiltersAndComputeAverages(
         bool isThetaChecked, 
         bool isBeta1Checked, 
         bool isBeta2Checked,
@@ -42,9 +37,14 @@ public slots:
         bool isSavitzkyGolayChecked
     );
 
+    void calculateRatio(const QString &avgTheta, const QString &avgBeta1, const QString &avgBeta2, QLineEdit *resultLineEdit);
 
 private:
-    void filterAndAverage(const QString &input, double maxLimit, double multiple, double reductionFactor, QLineEdit *averageLineEdit);
+    // Funciones auxiliares
+    QVector<double> convertStringToVector(const QString &data);
+    QString convertVectorToString(const QVector<double> &values);  // Nueva función añadida
+    QVector<double> ferraFilter(const QVector<double> &values, double maxLimit, double multiple, double reductionFactor);
+    double calculateAverage(const QVector<double> &values);
 };
 
 #endif // LOGICHANDLER_H

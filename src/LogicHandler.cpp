@@ -1,11 +1,154 @@
 #include "LogicHandler.h"
 #include <QStringList>
 #include <algorithm>
-#include <QDebug> 
+#include <QDebug>
 
 LogicHandler::LogicHandler(QObject *parent) : QObject(parent)
 {
 }
+
+// Función para convertir una cadena en un vector de doubles
+QVector<double> LogicHandler::convertStringToVector(const QString &data) {
+    QStringList strList = data.split(",");
+    QVector<double> values;
+    foreach (const QString& str, strList) {
+        bool ok;
+        double value = str.toDouble(&ok);
+        if (ok) {
+            values.append(value);
+        }
+    }
+    return values;
+}
+
+// Función de filtrado de Ferra
+QVector<double> LogicHandler::ferraFilter(const QVector<double> &values, double maxLimit, double multiple, double reductionFactor) {
+    if (values.isEmpty() || values.size() < 4) {
+        return QVector<double>();  // Retornar vector vacío si no hay suficientes datos
+    }
+
+    double sumOriginal = std::accumulate(values.begin(), values.end(), 0.0);
+    double averageOriginal = sumOriginal / values.size();
+
+    double maxValue = *std::max_element(values.begin(), values.end());
+    if (maxValue > maxLimit) {
+        maxValue = maxLimit;
+    }
+    if (maxValue > multiple * averageOriginal) {
+        maxValue = averageOriginal;
+    } else if (maxValue > 4 * averageOriginal) {
+        maxValue -= reductionFactor * (maxValue - averageOriginal);
+    }
+
+    QVector<double> adjustedValues = values;
+    for (int i = 0; i < adjustedValues.size(); ++i) {
+        if (adjustedValues[i] > maxValue) {
+            adjustedValues[i] = maxValue;
+        }
+    }
+
+    return adjustedValues;
+}
+
+// Función para calcular el promedio de un vector de valores
+double LogicHandler::calculateAverage(const QVector<double> &values) {
+    if (values.isEmpty()) {
+        return 0;  // Retornar 0 si el vector está vacío
+    }
+    double sum = std::accumulate(values.begin(), values.end(), 0.0);
+    return sum / values.size();
+}
+
+QString LogicHandler::convertVectorToString(const QVector<double> &values) {
+    QStringList stringList;
+    for (double value : values) {
+        stringList.append(QString::number(value));
+    }
+    return stringList.join(",");
+}
+
+void LogicHandler::applyFiltersAndComputeAverages(
+    bool isThetaChecked, bool isBeta1Checked, bool isBeta2Checked,
+    const QString &theta, const QString &beta1, const QString &beta2,
+    QLineEdit *lineEdit_avg_theta, QLineEdit *lineEdit_avg_beta1, QLineEdit *lineEdit_avg_beta2,
+    bool isExponentialFilteringChecked, bool isDataInterpolationChecked,
+    bool isMedianFilteringChecked, bool isNormalizationChecked, bool isSavitzkyGolayChecked
+) {
+    // Convertir cadenas a vectores de valores
+    QVector<double> thetaValues = convertStringToVector(theta);
+    QVector<double> beta1Values = convertStringToVector(beta1);
+    QVector<double> beta2Values = convertStringToVector(beta2);
+
+    // Aplicar filtrado de Ferra si está marcado
+    if (isThetaChecked) {
+        thetaValues = ferraFilter(thetaValues, 300, 4, 0.2);
+    }
+    if (isBeta1Checked) {
+        beta1Values = ferraFilter(beta1Values, 20, 10, 0.2);
+    }
+    if (isBeta2Checked) {
+        beta2Values = ferraFilter(beta2Values, 20, 10, 0.2);
+    }
+
+    // Aplicar otros filtros si están marcados
+    if (isExponentialFilteringChecked) {
+        thetaValues = convertStringToVector(exponentialFiltering(convertVectorToString(thetaValues)));
+        beta1Values = convertStringToVector(exponentialFiltering(convertVectorToString(beta1Values)));
+        beta2Values = convertStringToVector(exponentialFiltering(convertVectorToString(beta2Values)));
+    }
+
+    if (isDataInterpolationChecked) {
+        thetaValues = convertStringToVector(dataInterpolation(convertVectorToString(thetaValues)));
+        beta1Values = convertStringToVector(dataInterpolation(convertVectorToString(beta1Values)));
+        beta2Values = convertStringToVector(dataInterpolation(convertVectorToString(beta2Values)));
+    }
+
+    if (isMedianFilteringChecked) {
+        thetaValues = convertStringToVector(medianFiltering(convertVectorToString(thetaValues)));
+        beta1Values = convertStringToVector(medianFiltering(convertVectorToString(beta1Values)));
+        beta2Values = convertStringToVector(medianFiltering(convertVectorToString(beta2Values)));
+    }
+
+    if (isNormalizationChecked) {
+        thetaValues = convertStringToVector(normalization(convertVectorToString(thetaValues)));
+        beta1Values = convertStringToVector(normalization(convertVectorToString(beta1Values)));
+        beta2Values = convertStringToVector(normalization(convertVectorToString(beta2Values)));
+    }
+
+    if (isSavitzkyGolayChecked) {
+        thetaValues = convertStringToVector(savitzkyGolaySmoothing(convertVectorToString(thetaValues)));
+        beta1Values = convertStringToVector(savitzkyGolaySmoothing(convertVectorToString(beta1Values)));
+        beta2Values = convertStringToVector(savitzkyGolaySmoothing(convertVectorToString(beta2Values)));
+    }
+
+    // Calcular y establecer los promedios
+    lineEdit_avg_theta->setText(QString::number(calculateAverage(thetaValues)));
+    lineEdit_avg_beta1->setText(QString::number(calculateAverage(beta1Values)));
+    lineEdit_avg_beta2->setText(QString::number(calculateAverage(beta2Values)));
+}
+
+
+void LogicHandler::calculateRatio(const QString &avgTheta, const QString &avgBeta1, const QString &avgBeta2, QLineEdit *resultLineEdit)
+{
+    bool okTheta, okBeta1, okBeta2;
+    double theta = avgTheta.toDouble(&okTheta);
+    double beta1 = avgBeta1.toDouble(&okBeta1);
+    double beta2 = avgBeta2.toDouble(&okBeta2);
+
+    if (!okTheta || !okBeta1 || !okBeta2)
+    {
+        resultLineEdit->setText("Error: Invalid number format in the averages");
+        return;
+    }
+
+    double ratio = theta / (beta1 + beta2 / 2.0);
+    resultLineEdit->setText(QString::number(ratio));
+}
+
+
+
+
+// POST-FILTER
 
 QString LogicHandler::exponentialFiltering(const QString &data) {
     qDebug() << "Applying Exponential Filtering";
@@ -42,186 +185,3 @@ QString LogicHandler::savitzkyGolaySmoothing(const QString &data) {
     return processedData;
 }
 
-void LogicHandler::updateAllAverages(
-        const QString &inputTheta, double maxLimitTheta, double multipleTheta, double reductionFactorTheta, QLineEdit *averageLineEditTheta,
-        const QString &inputBeta1, double maxLimitBeta1, double multipleBeta1, double reductionFactorBeta1, QLineEdit *averageLineEditBeta1,
-        const QString &inputBeta2, double maxLimitBeta2, double multipleBeta2, double reductionFactorBeta2, QLineEdit *averageLineEditBeta2
-    ) {
-    updateAverage(inputTheta, maxLimitTheta, multipleTheta, reductionFactorTheta, averageLineEditTheta);  // For theta
-    updateAverage(inputBeta1, maxLimitBeta1, multipleBeta1, reductionFactorBeta1, averageLineEditBeta1);  // For beta1
-    updateAverage(inputBeta2, maxLimitBeta2, multipleBeta2, reductionFactorBeta2, averageLineEditBeta2);  // For beta2
-}
-
-
-void LogicHandler::updateAverage(
-    const QString &input,
-    double maxLimit,
-    double multiple,
-    double reductionFactor,
-    QLineEdit *averageLineEdit
-) {
-    QStringList strList = input.split(",");
-    if (strList.isEmpty() || strList.size() < 4) {
-        averageLineEdit->setText("");  // Return blank average
-        return;
-    }
-
-    QVector<double> values;
-    foreach (const QString& str, strList) {
-        bool ok;
-        double value = str.toDouble(&ok);
-        if (ok) {
-            values.append(value);
-        }
-    }
-
-    double sumOriginal = std::accumulate(values.begin(), values.end(), 0.0);
-    double averageOriginal = sumOriginal / values.size();
-
-    double maxValue = *std::max_element(values.begin(), values.end());
-    if (maxValue > maxLimit) {
-        maxValue = maxLimit;
-    }
-    if (maxValue > multiple * averageOriginal) {
-        maxValue = averageOriginal;
-    } else if (maxValue > 4 * averageOriginal) {
-        maxValue -= reductionFactor * (maxValue - averageOriginal);
-    }
-
-    for (int i = 0; i < values.size(); ++i) {
-        if (values[i] > maxValue) {
-            values[i] = maxValue;
-        }
-    }
-    double sumAdjusted = std::accumulate(values.begin(), values.end(), 0.0);
-    double averageAdjusted = sumAdjusted / values.size();
-
-    averageLineEdit->setText(QString::number(averageAdjusted));
-}
-
-
-void LogicHandler::calculateRatio(const QString &avgTheta, const QString &avgBeta1, const QString &avgBeta2, QLineEdit *resultLineEdit)
-{
-    bool okTheta, okBeta1, okBeta2;
-    double theta = avgTheta.toDouble(&okTheta);
-    double beta1 = avgBeta1.toDouble(&okBeta1);
-    double beta2 = avgBeta2.toDouble(&okBeta2);
-
-    if (!okTheta || !okBeta1 || !okBeta2)
-    {
-        resultLineEdit->setText("Error: Invalid number format in the averages");
-        return;
-    }
-
-    double ratio = theta / (beta1 + beta2 / 2.0);
-    resultLineEdit->setText(QString::number(ratio));
-}
-
-void LogicHandler::applyFiltersIfChecked(
-    bool isThetaChecked, bool isBeta1Checked, bool isBeta2Checked,
-    const QString &theta, const QString &beta1, const QString &beta2,
-    QLineEdit *lineEdit_avg_theta, QLineEdit *lineEdit_avg_beta1, QLineEdit *lineEdit_avg_beta2,
-    bool isExponentialFilteringChecked, bool isDataInterpolationChecked,
-    bool isMedianFilteringChecked, bool isNormalizationChecked, bool isSavitzkyGolayChecked
-) {
-    QString processedTheta = theta;
-    QString processedBeta1 = beta1;
-    QString processedBeta2 = beta2;
-
-    // Si isThetaChecked es true, aplicar el primer filtro a theta
-    if (isThetaChecked) {
-        updateAverage(theta, 300, 4, 0.2, lineEdit_avg_theta);
-        processedTheta = lineEdit_avg_theta->text();
-    }
-
-    // Si isBeta1Checked es true, aplicar el primer filtro a beta1
-    if (isBeta1Checked) {
-        updateAverage(beta1, 20, 10, 0.2, lineEdit_avg_beta1);
-        processedBeta1 = lineEdit_avg_beta1->text();
-    }
-
-    // Si isBeta2Checked es true, aplicar el primer filtro a beta2
-    if (isBeta2Checked) {
-        updateAverage(beta2, 20, 10, 0.2, lineEdit_avg_beta2);
-        processedBeta2 = lineEdit_avg_beta2->text();
-    }
-
-    // Llamadas a las funciones de post-filtrado, si los checkboxes correspondientes están marcados
-    if (isExponentialFilteringChecked) {
-        processedTheta = exponentialFiltering(processedTheta);
-        processedBeta1 = exponentialFiltering(processedBeta1);
-        processedBeta2 = exponentialFiltering(processedBeta2);
-    }
-
-    if (isDataInterpolationChecked) {
-        processedTheta = dataInterpolation(processedTheta);
-        processedBeta1 = dataInterpolation(processedBeta1);
-        processedBeta2 = dataInterpolation(processedBeta2);
-    }
-
-    if (isMedianFilteringChecked) {
-        processedTheta = medianFiltering(processedTheta);
-        processedBeta1 = medianFiltering(processedBeta1);
-        processedBeta2 = medianFiltering(processedBeta2);
-    }
-
-    if (isNormalizationChecked) {
-        processedTheta = normalization(processedTheta);
-        processedBeta1 = normalization(processedBeta1);
-        processedBeta2 = normalization(processedBeta2);
-    }
-
-    if (isSavitzkyGolayChecked) {
-        processedTheta = savitzkyGolaySmoothing(processedTheta);
-        processedBeta1 = savitzkyGolaySmoothing(processedBeta1);
-        processedBeta2 = savitzkyGolaySmoothing(processedBeta2);
-    }
-
-    // Actualizar los QLineEdit con los datos procesados
-    lineEdit_avg_theta->setText(processedTheta);
-    lineEdit_avg_beta1->setText(processedBeta1);
-    lineEdit_avg_beta2->setText(processedBeta2);
-}
-
-
-void LogicHandler::filterAndAverage(const QString &input, double maxLimit, double multiple, double reductionFactor, QLineEdit *averageLineEdit)
-{
-    QStringList strList = input.split(",");
-    if (strList.isEmpty() || strList.size() < 4) {
-        averageLineEdit->setText("");  // Return blank average
-        return;
-    }
-
-    QVector<double> values;
-    foreach (const QString& str, strList) {
-        bool ok;
-        double value = str.toDouble(&ok);
-        if (ok) {
-            values.append(value);
-        }
-    }
-
-    double sumOriginal = std::accumulate(values.begin(), values.end(), 0.0);
-    double averageOriginal = sumOriginal / values.size();
-
-    double maxValue = *std::max_element(values.begin(), values.end());
-    if (maxValue > maxLimit) {
-        maxValue = maxLimit;
-    }
-    if (maxValue > multiple * averageOriginal) {
-        maxValue = averageOriginal;
-    } else if (maxValue > 4 * averageOriginal) {
-        maxValue -= reductionFactor * (maxValue - averageOriginal);
-    }
-
-    for (int i = 0; i < values.size(); ++i) {
-        if (values[i] > maxValue) {
-            values[i] = maxValue;
-        }
-    }
-    double sumAdjusted = std::accumulate(values.begin(), values.end(), 0.0);
-    double averageAdjusted = sumAdjusted / values.size();
-
-    // Paso 3: Devolver el promedio ajustado.
-    averageLineEdit->setText(QString::number(averageAdjusted));
-}
