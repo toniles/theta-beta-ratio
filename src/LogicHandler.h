@@ -19,14 +19,29 @@ public:
 
 public slots:
     void updateAverage(const QString &input, double maxLimit, double multiple, double reductionFactor, QLineEdit *averageLineEdit);
+    void updateAllAverages(
+        const QString &inputTheta, double maxLimitTheta, double multipleTheta, double reductionFactorTheta, QLineEdit *averageLineEditTheta,
+        const QString &inputBeta1, double maxLimitBeta1, double multipleBeta1, double reductionFactorBeta1, QLineEdit *averageLineEditBeta1,
+        const QString &inputBeta2, double maxLimitBeta2, double multipleBeta2, double reductionFactorBeta2, QLineEdit *averageLineEditBeta2
+    );
     void calculateRatio(const QString &avgTheta, const QString &avgBeta1, const QString &avgBeta2, QLineEdit *resultLineEdit);
     void applyFiltersIfChecked(
-        bool isThetaChecked, bool isBeta1Checked, bool isBeta2Checked,
-        const QString &theta, const QString &beta1, const QString &beta2,
-        QLineEdit *lineEdit_avg_theta, QLineEdit *lineEdit_avg_beta1, QLineEdit *lineEdit_avg_beta2,
-        bool isExponentialFilteringChecked, bool isDataInterpolationChecked,
-        bool isMedianFilteringChecked, bool isNormalizationChecked, bool isSavitzkyGolayChecked
+        bool isThetaChecked, 
+        bool isBeta1Checked, 
+        bool isBeta2Checked,
+        const QString &theta, 
+        const QString &beta1, 
+        const QString &beta2,
+        QLineEdit *lineEdit_avg_theta, 
+        QLineEdit *lineEdit_avg_beta1, 
+        QLineEdit *lineEdit_avg_beta2,
+        bool isExponentialFilteringChecked, 
+        bool isDataInterpolationChecked,
+        bool isMedianFilteringChecked, 
+        bool isNormalizationChecked, 
+        bool isSavitzkyGolayChecked
     );
+
 
 private:
     void filterAndAverage(const QString &input, double maxLimit, double multiple, double reductionFactor, QLineEdit *averageLineEdit);

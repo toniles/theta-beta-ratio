@@ -42,6 +42,17 @@ QString LogicHandler::savitzkyGolaySmoothing(const QString &data) {
     return processedData;
 }
 
+void LogicHandler::updateAllAverages(
+        const QString &inputTheta, double maxLimitTheta, double multipleTheta, double reductionFactorTheta, QLineEdit *averageLineEditTheta,
+        const QString &inputBeta1, double maxLimitBeta1, double multipleBeta1, double reductionFactorBeta1, QLineEdit *averageLineEditBeta1,
+        const QString &inputBeta2, double maxLimitBeta2, double multipleBeta2, double reductionFactorBeta2, QLineEdit *averageLineEditBeta2
+    ) {
+    updateAverage(inputTheta, maxLimitTheta, multipleTheta, reductionFactorTheta, averageLineEditTheta);  // For theta
+    updateAverage(inputBeta1, maxLimitBeta1, multipleBeta1, reductionFactorBeta1, averageLineEditBeta1);  // For beta1
+    updateAverage(inputBeta2, maxLimitBeta2, multipleBeta2, reductionFactorBeta2, averageLineEditBeta2);  // For beta2
+}
+
+
 void LogicHandler::updateAverage(
     const QString &input,
     double maxLimit,
@@ -111,10 +122,7 @@ void LogicHandler::applyFiltersIfChecked(
     const QString &theta, const QString &beta1, const QString &beta2,
     QLineEdit *lineEdit_avg_theta, QLineEdit *lineEdit_avg_beta1, QLineEdit *lineEdit_avg_beta2,
     bool isExponentialFilteringChecked, bool isDataInterpolationChecked,
-    bool isMedianFilteringChecked, bool isNormalizationChecked, bool isSavitzkyGolayChecked,
-    double maxLimitTheta, double multipleTheta, double reductionFactorTheta,
-    double maxLimitBeta1, double multipleBeta1, double reductionFactorBeta1,
-    double maxLimitBeta2, double multipleBeta2, double reductionFactorBeta2
+    bool isMedianFilteringChecked, bool isNormalizationChecked, bool isSavitzkyGolayChecked
 ) {
     QString processedTheta = theta;
     QString processedBeta1 = beta1;
