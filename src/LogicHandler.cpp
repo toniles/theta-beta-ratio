@@ -339,4 +339,3 @@ QString LogicHandler::savitzkyGolaySmoothing(const QString &data) {
 
     return convertVectorToString(smoothedValues);
 }
-

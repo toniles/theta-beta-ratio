@@ -60,41 +60,58 @@ void MainWindow::setupStyle()
 
 void MainWindow::initWidgets()
 {
-    // Inicialización de widgets
+    // Inicialización de labels
     label_theta = new QLabel(" θ ", this);
-    lineEdit_theta = new QLineEdit(this);
-    lineEdit_avg_theta = new QLineEdit(this);
-    checkBox_theta = new QCheckBox("Apply Ferra's Filtering to θ waves ", this);
-    
     label_beta1 = new QLabel("β₁ ", this);
-    lineEdit_beta1 = new QLineEdit(this);
-    lineEdit_avg_beta1 = new QLineEdit(this);
-    checkBox_beta1 = new QCheckBox("Apply Ferra's Filtering to β₁ waves", this);
-
     label_beta2 = new QLabel("β₂ ", this);
+
+    // Inicialización y configuración de line edits para theta, beta1 y beta2
+    lineEdit_theta = new QLineEdit(this);
+    lineEdit_theta->setPlaceholderText("100.1, 100, 100, 100, 100");  
+    lineEdit_theta->setMinimumWidth(400);
+    lineEdit_theta->setAlignment(Qt::AlignCenter);  // Centrado de texto
+    
+    lineEdit_beta1 = new QLineEdit(this);
+    lineEdit_beta1->setPlaceholderText("1.2, 1.1, 1.1, 1.1, 1.1, 1.2");  
+    lineEdit_beta1->setMinimumWidth(400);
+    lineEdit_beta1->setAlignment(Qt::AlignCenter);  // Centrado de texto
+
     lineEdit_beta2 = new QLineEdit(this);
+    lineEdit_beta2->setPlaceholderText("1.2, 1.1, 1.1, 1.1, 1.1, 1.2");
+    lineEdit_beta2->setMinimumWidth(400);
+    lineEdit_beta2->setAlignment(Qt::AlignCenter);  // Centrado de texto
+
+    // Inicialización de line edits para promedios
+    lineEdit_avg_theta = new QLineEdit(this);
+    lineEdit_avg_beta1 = new QLineEdit(this);
     lineEdit_avg_beta2 = new QLineEdit(this);
+
+    // Inicialización y configuración de checkboxes
+    checkBox_theta = new QCheckBox("Apply Ferra's Filtering to θ waves ", this);
+    checkBox_beta1 = new QCheckBox("Apply Ferra's Filtering to β₁ waves", this);
     checkBox_beta2 = new QCheckBox("Apply Ferra's Filtering to β₂ waves", this);
     
-    lineEdit_theta->setPlaceholderText("100.1, 100, 100, 100, 100");  
-    lineEdit_beta1->setPlaceholderText("1.2, 1.1, 1.1, 1.1, 1.1, 1.2");  
-    lineEdit_beta2->setPlaceholderText("1.2, 1.1, 1.1, 1.1, 1.1, 1.2"); 
-    lineEdit_theta->setMinimumWidth(400);
-    lineEdit_beta1->setMinimumWidth(400);
-    lineEdit_beta2->setMinimumWidth(400);
-
-    btn_calculate = new QPushButton("Calculate θ/β ratio", this);
-    lineEdit_result = new QLineEdit(this);
-
-
     checkBox_exponentialFiltering = new QCheckBox("Exponential Filtering", this);
     checkBox_dataInterpolation = new QCheckBox("Data Interpolation", this);
     checkBox_medianFiltering = new QCheckBox("Median Filtering", this);
     checkBox_normalization = new QCheckBox("Normalization", this);
     checkBox_savitzkyGolay = new QCheckBox("Savitzky-Golay Smoothing", this);
-    
 
+    // Inicialización y configuración del botón calcular
+    btn_calculate = new QPushButton("Calculate θ/β ratio", this);
+    
+    // Inicialización y configuración de line edit para el resultado
+    lineEdit_result = new QLineEdit(this);
+    lineEdit_result->setAlignment(Qt::AlignCenter);  // Centrado de texto
+    lineEdit_result->setMaximumWidth(350);  // Ancho máximo ajustado a 350px
+
+    // Configuración de la fuente para el line edit del resultado
+    QFont resultFont = lineEdit_result->font();
+    resultFont.setBold(true);
+    resultFont.setPointSize(18);
+    lineEdit_result->setFont(resultFont);
 }
+
 
 void MainWindow::setupLayouts(QVBoxLayout *layout)
 {
