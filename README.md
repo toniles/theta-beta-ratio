@@ -48,7 +48,7 @@ This comprehensive methodology ensures a robust computation of the $\( \frac{θ}
 
 ## Screenshot
 
-![image](https://github.com/toniles/theta-beta-ratio/assets/120176462/afbb6e63-4b00-4cdb-87d2-6b6d157820ab)
+![image](https://github.com/toniles/theta-beta-ratio/assets/120176462/ce8038d4-3ad9-4ea3-93ef-fadc2afd9150)
 
 ## Download
 
