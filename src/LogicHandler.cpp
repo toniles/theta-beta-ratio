@@ -144,23 +144,30 @@ QVector<double> LogicHandler::ferraFilter(const QVector<double> &values, double 
         return QVector<double>();  // Return empty vector if insufficient data
     }
 
-    double sumOriginal = std::accumulate(values.begin(), values.end(), 0.0);
-    double averageOriginal = sumOriginal / values.size();
+    QVector<double> adjustedValues = values;  // Copy the original values to the adjustedValues vector
+    QVector<double> nonExtremeValues;  // Vector to hold values that are not extreme
 
-    double maxValue = *std::max_element(values.begin(), values.end());
-    if (maxValue > maxLimit) {
-        maxValue = maxLimit;
-    }
-    if (maxValue > multiple * averageOriginal) {
-        maxValue = averageOriginal;
-    } else if (maxValue > 4 * averageOriginal) {
-        maxValue -= reductionFactor * (maxValue - averageOriginal);
-    }
-
-    QVector<double> adjustedValues = values;
+    // First pass: Identify non-extreme values and calculate their average
     for (int i = 0; i < adjustedValues.size(); ++i) {
-        if (adjustedValues[i] > maxValue) {
-            adjustedValues[i] = maxValue;
+        if (adjustedValues.at(i) < maxLimit) {
+            nonExtremeValues.append(adjustedValues.at(i));
+        }
+    }
+
+    if (nonExtremeValues.isEmpty()) {
+        return QVector<double>();  // Return empty vector if all values are extreme
+    }
+
+    double averageNonExtreme = std::accumulate(nonExtremeValues.begin(), nonExtremeValues.end(), 0.0) / nonExtremeValues.size();
+
+    // Second pass: Adjust extreme values to the average of non-extreme values
+    for (int i = 0; i < adjustedValues.size(); ++i) {
+        if (adjustedValues.at(i) > maxLimit) {
+            adjustedValues[i] = averageNonExtreme;
+        } else if (adjustedValues.at(i) > multiple * averageNonExtreme) {
+            adjustedValues[i] = averageNonExtreme;
+        } else if (adjustedValues.at(i) > 4 * averageNonExtreme) {
+            adjustedValues[i] = adjustedValues.at(i) / reductionFactor;
         }
     }
 
