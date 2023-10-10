@@ -56,7 +56,9 @@ Go to: https://github.com/toniles/theta-beta-ratio
 
 CTRL + F
 
-Type: releases
+Type: releases 
+
+Choose: Windows (installer) or Linux.
 
 ## Disclaimer
 
