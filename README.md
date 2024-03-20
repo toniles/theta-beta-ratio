@@ -68,6 +68,3 @@ This tool is a mathematical representation and is not intended for the diagnosis
 
 This software is distributed under "The Unlicense". For a full understanding of what this entails, please refer to the accompanying `LICENSE` file or visit the official [Unlicense](https://unlicense.org/) website.
 
-## Contributions and Feedback
-
-For domain experts wishing to offer collaborations or feedback, please engage directly through the repository's structured systems.
